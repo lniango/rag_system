@@ -44,7 +44,7 @@ def setup_rag_system():
     loader = PyPDFLoader(str(pdf))
     documents.extend(loader.load())
     
-  documents = loader.load()
+  #documents = loader.load()
   
   # Split the document into chunks
   splitter = RecursiveCharacterTextSplitter(
@@ -82,8 +82,8 @@ def setup_rag_system():
 
 
 # Function to get the response from the RAG system
+retriever = setup_rag_system()
 async def get_rag_response(query : str):
-  retriever = setup_rag_system()
   
   # Retrieve the relevant documents using 'get_relevant_documents' method
   retrieved_docs = retriever.get_relevant_documents(query)
