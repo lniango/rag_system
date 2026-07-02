@@ -1,7 +1,8 @@
 # Sources
 # https://github.com/pixegami/langchain-rag-tutorial
 # https://www.datacamp.com/tutorial/building-a-rag-system-with-langchain-and-fastapi?utm_cid=23552157100&utm_aid=188237542690&utm_campaign=230119_1-ps-other~dsa-tofu~ai_2-b2c_3-emea_4-prc_5-na_6-na_7-le_8-pdsh-go_9-nb-e_10-na_11-na&utm_loc=9196856-&utm_mtd=-c&utm_kw=&utm_source=google&utm_medium=paid_search&utm_content=ps-other~emea-en~dsa~tofu~tutorial~artificial-intelligence&gad_source=1&gad_campaignid=23552157100&gbraid=0AAAAADQ9WsGgFWG_y4lyQ0i4PMQtYlyJG&gclid=Cj0KCQjw9ZLSBhCcARIsAEhGKgN7WOsPl0gVKXCeFTrRwlKyi3bIsaBK0pMMaLvMR8tAIJ-d7TkWL9EaAsMPEALw_wcB
-
+# Embedding : https://campus.datacamp.com/courses/introduction-to-embeddings-with-the-openai-api/what-are-embeddings?ex=4
+# Pgvector : https://www.datacamp.com/tutorial/pgvector-tutorial
 from dotenv import load_dotenv
 import os
 load_dotenv()
@@ -37,3 +38,14 @@ which makes them suitable for similarity searches.
 """
 from langchain_openai.embeddings import OpenAIEmbeddings
 embeddings = OpenAIEmbeddings()
+
+# Vector stores
+"""
+  After generating the embeddings, the next step is to store them in a vector store like PGVector, FAISS, 
+  or any other supported by LangChain.
+  This allows for fast and accurate retrieval of relevant documents when a query is made.
+"""
+from langchain_community.vectorstores import FAISS
+# FAISS helps us find the most similar vectors really fast.
+vector_store = FAISS.from_documents(document_chunk, embeddings) # create a vector store
+
