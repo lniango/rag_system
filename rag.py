@@ -5,8 +5,10 @@
 # Pgvector : https://www.datacamp.com/tutorial/pgvector-tutorial
 from dotenv import load_dotenv
 import os
+
 load_dotenv()
-openai_api_key = os.getenv("OPENAI_API_KEY")
+openai_api_key = os.getenv("OPENAI_API_KEY") # Openai token
+hgface_token = os.getenv("HF_TOKEN")
 
 # Documents loader
 from langchain_community.document_loaders import TextLoader, UnstructuredPDFLoader, PyPDFLoader
@@ -22,15 +24,18 @@ loader = PyPDFLoader(
 #documents2 = loader2.load()
 
 documents = loader.load()
-print(len(documents))
-print(documents[0].page_content[:200])
+#print(len(documents))
+#print(documents[0].page_content[:200])
 
 # Chunking the text
 """
   Large documents are often split into smaller chunks to make them easier to index and retrieve
 """
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+splitter = RecursiveCharacterTextSplitter(
+            chunk_size=300, 
+            chunk_overlap=50
+            )
 document_chunk = splitter.split_documents(documents)
 
 #print(document_chunk)
@@ -85,9 +90,22 @@ Add in the LLM and using it to actually generate the response based on the docum
 """
 from langchain_openai import OpenAI
 from langchain.chains import RetrievalQA
+from langchain_community.llms import HuggingFacePipeline
+from transformers import pipeline
 
 # OpenAI: This model will be responsible for generating text responses.
-llm = OpenAI(openai_api_key=openai_api_key)
+#llm = OpenAI(openai_api_key=openai_api_key)
+llm_model = "gpt2" #"microsoft/phi-2" #"mistralai/Mistral-7B-Instruct-v0.1"
+pipe = pipeline(
+  "text-generation",
+  model = llm_model, #"google/flan-t5-base", # "google/flan-t5-base"
+  max_new_tokens=200,
+  #device=-1
+  #do_sample=False,
+  #token = hgface_token
+)
+llm = HuggingFacePipeline(pipeline=pipe)
+
 # RetrievalQA: This is the special LangChain feature that combines retrieval 
 # and QA (question answering). It connects the retriever (which finds the relevant documents) 
 # to the LLM (which generates the answer).
@@ -96,3 +114,11 @@ qa_chain = RetrievalQA.from_chain_type(
           chain_type = "stuff",
           retriever = retriever
 )
+
+query = "What are Large Vision Diffusion Transformer?"
+response = qa_chain.invoke(
+  {"query" : query}
+)
+
+# Response
+print(f"Response : {response['result']}")
