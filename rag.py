@@ -36,8 +36,18 @@ LangChain supports creating vector embeddings using various models, such as Open
 These embeddings represent the semantic meaning of the text chunks, 
 which makes them suitable for similarity searches. 
 """
+# Tuto RAG : https://huggingface.co/learn/cookbook/advanced_rag
 from langchain_openai.embeddings import OpenAIEmbeddings
-embeddings = OpenAIEmbeddings()
+from langchain_huggingface import HuggingFaceEmbeddings
+#embeddings = OpenAIEmbeddings()
+model_name = "sentence-transformers/all-mpnet-base-v2"
+model_kwargs = {"device": "cpu"}
+encode_kwargs = {"normalize_embeddings": False}
+embeddings = HuggingFaceEmbeddings(
+             model_name = model_name,
+             model_kwargs = model_kwargs,
+             encode_kwargs = encode_kwargs
+)
 
 # Vector stores
 """
@@ -57,7 +67,27 @@ vector_store = FAISS.from_documents(
 It's the component that goes through the indexed documents and finds the ones most relevant to a user’s query. 
 """
 # k=5 means, Give me the top 5 most relevant documents.
+# It helps reduce the noise.
 retriever = vector_store.as_retriever(
   search_type = "similarity",
   search_kwargs = {"k": 5}
+)
+
+
+# Querying
+"""
+Add in the LLM and using it to actually generate the response based on the documents retrieved.
+"""
+from langchain_openai import OpenAI
+from langchain.chains import RetrievalQA
+
+# OpenAI: This model will be responsible for generating text responses.
+llm = OpenAI(openai_api_key=openai_api_key)
+# RetrievalQA: This is the special LangChain feature that combines retrieval 
+# and QA (question answering). It connects the retriever (which finds the relevant documents) 
+# to the LLM (which generates the answer).
+qa_chain = RetrievalQA.from_chain_type(
+          llm = llm,
+          chain_type = "stuff",
+          retriever = retriever
 )
