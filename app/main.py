@@ -1,6 +1,6 @@
 # Developing the API with FastAPI
 from fastapi import FastAPI
-from endpoints import router
+from app.endpoints import router
 
 # setting up a FastAPI instance, and then pulling in all the routes
 # (or API paths) from another file, which we'll create next

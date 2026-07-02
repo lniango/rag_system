@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from rag import get_rag_response
+from app.rag import get_rag_response
 
 # Create API router to manage API routes
 router = APIRouter()
