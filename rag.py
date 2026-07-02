@@ -116,7 +116,7 @@ llm_model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0" #"meta-llama/Llama-3.2-3B" #"gp
 pipe = pipeline(
   "text-generation",
   model = llm_model, #"google/flan-t5-base", # "google/flan-t5-base"
-  max_new_tokens=64,
+  max_new_tokens=256,
   temperature=0.1,
   do_sample=False,
   return_full_text=False
