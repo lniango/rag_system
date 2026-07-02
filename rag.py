@@ -12,6 +12,7 @@ hgface_token = os.getenv("HF_TOKEN")
 
 # Documents loader
 from langchain_community.document_loaders import TextLoader, UnstructuredPDFLoader, PyPDFLoader
+from pathlib import Path
 """loader = UnstructuredPDFLoader(
   file_path= "data/LaVin-DiT.pdf",
   mode= 'elements',
@@ -19,9 +20,15 @@ from langchain_community.document_loaders import TextLoader, UnstructuredPDFLoad
 #loader = PyPDFLoader(
 #  file_path= "data/LaVin-DiT.pdf"
 #)
-loader = TextLoader(
-  file_path="data/text.txt"
-)
+
+#loader = TextLoader(
+#  file_path="data/text.txt"
+#)
+
+documents = []
+for pdf in Path("data/papers").glob("*.pdf"):
+  loader = PyPDFLoader(str(pdf))
+  documents.extend(loader.load())
 
 #loader2 = TextLoader('data/text.txt')
 #documents2 = loader2.load()
@@ -128,7 +135,8 @@ qa_chain = RetrievalQA.from_chain_type(
           return_source_documents=True
 )
 
-query = "Are polar bears in danger?"
+#query = "Are polar bears in danger?"
+query = "What are the differences between DiT and LaVin-DiT?"
 response = qa_chain.invoke(
   {"query" : query}
 )
@@ -154,3 +162,10 @@ response = pipe(
 )
 
 print(response[0]["generated_text"])"""
+
+"""
+QUESTIONS:
+What are the differences between DiT and LaVin-DiT?
+What datasets are used by these models?
+How does 3D RoPE work?
+"""
