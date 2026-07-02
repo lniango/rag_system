@@ -1,0 +1,20 @@
+*.env
+.env
+bin/
+
+# Python environnements 
+venv/
+rag_env/
+.env/
+
+# cache 
+__pycache__/
+*.pyc
+
+# system
+.DS_Store
+
+# logs / notebooks checkpoints
+.ipynb_checkpoints/
+
+*.txt
