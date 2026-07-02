@@ -9,16 +9,21 @@ load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
 # Documents loader
-from langchain_community.document_loaders import TextLoader, UnstructuredPDFLoader
-loader = UnstructuredPDFLoader(
+from langchain_community.document_loaders import TextLoader, UnstructuredPDFLoader, PyPDFLoader
+"""loader = UnstructuredPDFLoader(
   file_path= "data/LaVin-DiT.pdf",
   mode= 'elements',
+)"""
+loader = PyPDFLoader(
+  file_path= "data/LaVin-DiT.pdf"
 )
 
 #loader2 = TextLoader('data/text.txt')
 #documents2 = loader2.load()
 
 documents = loader.load()
+print(len(documents))
+print(documents[0].page_content[:200])
 
 # Chunking the text
 """
@@ -38,7 +43,7 @@ which makes them suitable for similarity searches.
 """
 # Tuto RAG : https://huggingface.co/learn/cookbook/advanced_rag
 from langchain_openai.embeddings import OpenAIEmbeddings
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 #embeddings = OpenAIEmbeddings()
 model_name = "sentence-transformers/all-mpnet-base-v2"
 model_kwargs = {"device": "cpu"}
