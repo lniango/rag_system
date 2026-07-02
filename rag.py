@@ -28,3 +28,12 @@ splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
 document_chunk = splitter.split_documents(documents)
 
 #print(document_chunk)
+
+#Embeddings
+"""
+LangChain supports creating vector embeddings using various models, such as OpenAI or HuggingFace models. 
+These embeddings represent the semantic meaning of the text chunks, 
+which makes them suitable for similarity searches. 
+"""
+from langchain_openai.embeddings import OpenAIEmbeddings
+embeddings = OpenAIEmbeddings()
