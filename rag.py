@@ -11,9 +11,12 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 from langchain_community.document_loaders import TextLoader, UnstructuredPDFLoader
 loader = UnstructuredPDFLoader(
   file_path= "data/LaVin-DiT.pdf",
-  mode= 'element',
+  mode= 'elements',
 )
+
+#loader2 = TextLoader('data/text.txt')
+#documents2 = loader2.load()
 
 documents = loader.load()
 
-print(documents)
+# Chunking the text
