@@ -47,5 +47,17 @@ embeddings = OpenAIEmbeddings()
 """
 from langchain_community.vectorstores import FAISS
 # FAISS helps us find the most similar vectors really fast.
-vector_store = FAISS.from_documents(document_chunk, embeddings) # create a vector store
+vector_store = FAISS.from_documents(
+               document_chunk, 
+               embeddings) # create a vector store
 
+
+# Retrieval
+"""
+It's the component that goes through the indexed documents and finds the ones most relevant to a user’s query. 
+"""
+# k=5 means, Give me the top 5 most relevant documents.
+retriever = vector_store.as_retriever(
+  search_type = "similarity",
+  search_kwargs = {"k": 5}
+)
