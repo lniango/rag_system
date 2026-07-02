@@ -20,3 +20,11 @@ loader = UnstructuredPDFLoader(
 documents = loader.load()
 
 # Chunking the text
+"""
+  Large documents are often split into smaller chunks to make them easier to index and retrieve
+"""
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+document_chunk = splitter.split_documents(documents)
+
+#print(document_chunk)
