@@ -43,8 +43,8 @@ documents = loader.load()
 """
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 splitter = RecursiveCharacterTextSplitter(
-            chunk_size=500, 
-            chunk_overlap=100
+            chunk_size=1000, 
+            chunk_overlap=200
             )
 document_chunk = splitter.split_documents(documents)
 
@@ -90,9 +90,9 @@ It's the component that goes through the indexed documents and finds the ones mo
 # It helps reduce the noise.
 retriever = vector_store.as_retriever(
   search_type = "similarity",
-  search_kwargs = {"k": 2}
+  search_kwargs = {"k": 3}
 )
-
+   
 
 # Querying
 """
