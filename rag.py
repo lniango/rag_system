@@ -16,8 +16,11 @@ from langchain_community.document_loaders import TextLoader, UnstructuredPDFLoad
   file_path= "data/LaVin-DiT.pdf",
   mode= 'elements',
 )"""
-loader = PyPDFLoader(
-  file_path= "data/LaVin-DiT.pdf"
+#loader = PyPDFLoader(
+#  file_path= "data/LaVin-DiT.pdf"
+#)
+loader = TextLoader(
+  file_path="data/text.txt"
 )
 
 #loader2 = TextLoader('data/text.txt')
@@ -33,8 +36,8 @@ documents = loader.load()
 """
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 splitter = RecursiveCharacterTextSplitter(
-            chunk_size=300, 
-            chunk_overlap=50
+            chunk_size=500, 
+            chunk_overlap=100
             )
 document_chunk = splitter.split_documents(documents)
 
@@ -80,7 +83,7 @@ It's the component that goes through the indexed documents and finds the ones mo
 # It helps reduce the noise.
 retriever = vector_store.as_retriever(
   search_type = "similarity",
-  search_kwargs = {"k": 5}
+  search_kwargs = {"k": 2}
 )
 
 
@@ -90,18 +93,27 @@ Add in the LLM and using it to actually generate the response based on the docum
 """
 from langchain_openai import OpenAI
 from langchain.chains import RetrievalQA
-from langchain_community.llms import HuggingFacePipeline
+from langchain_community.llms import HuggingFacePipeline, Ollama
 from transformers import pipeline
 
+# Ollama Models: 
 # OpenAI: This model will be responsible for generating text responses.
 #llm = OpenAI(openai_api_key=openai_api_key)
-llm_model = "gpt2" #"microsoft/phi-2" #"mistralai/Mistral-7B-Instruct-v0.1"
+#llm_model = Ollama(
+#  model= "tinyllama"#"llama3.2:1b"
+#)
+
+llm_model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0" #"meta-llama/Llama-3.2-3B" #"gpt2"
+#"microsoft/phi-2" #"microsoft/Phi-3-mini-4k-instruct" #'google/flan-t5-base'   #"TinyLlama/TinyLlama-1.1B-Chat-v1.0"#"gpt2" #"microsoft/phi-2" #"mistralai/Mistral-7B-Instruct-v0.1"
+
 pipe = pipeline(
   "text-generation",
   model = llm_model, #"google/flan-t5-base", # "google/flan-t5-base"
-  max_new_tokens=200,
+  max_new_tokens=64,
+  temperature=0.1,
+  do_sample=False,
+  return_full_text=False
   #device=-1
-  #do_sample=False,
   #token = hgface_token
 )
 llm = HuggingFacePipeline(pipeline=pipe)
@@ -112,13 +124,33 @@ llm = HuggingFacePipeline(pipeline=pipe)
 qa_chain = RetrievalQA.from_chain_type(
           llm = llm,
           chain_type = "stuff",
-          retriever = retriever
+          retriever = retriever, 
+          return_source_documents=True
 )
 
-query = "What are Large Vision Diffusion Transformer?"
+query = "Are polar bears in danger?"
 response = qa_chain.invoke(
   {"query" : query}
 )
 
 # Response
 print(f"Response : {response['result']}")
+
+"""print("\nDocuments utilisés:")
+for doc in response["source_documents"]:
+    print("-" * 80)
+    print(doc.page_content[:500])"""
+    
+    
+"""pipe = pipeline(
+    "text-generation",
+    model="TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    max_new_tokens=100,
+    return_full_text=False
+)
+
+response = pipe(
+    "<|user|>\nAre polar bears in danger?\n<|assistant|>\n"
+)
+
+print(response[0]["generated_text"])"""
