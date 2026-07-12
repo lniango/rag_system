@@ -13,7 +13,7 @@ A lightweight **Retrieval-Augmented Generation (RAG)** pipeline exposed through 
 ## Tech stack
 
 - **FastAPI** + **Uvicorn** – REST API server
-- **LangChain** (`langchain`, `langchain-community`, `langchain-text-splitters`) – document loading, splitting, and RAG orchestration
+- **LangChain** (`langchain`, `langchain-community`, `langchain-text-splitters`) used for document loading, splitting, and RAG orchestration
 - **FAISS** (`faiss-cpu`) – vector similarity search
 - **Sentence-Transformers** – embedding model (`all-mpnet-base-v2`)
 - **Hugging Face Transformers** – local LLM inference (TinyLlama-1.1B-Chat)
