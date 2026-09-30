@@ -5,26 +5,28 @@
 # Pgvector : https://www.datacamp.com/tutorial/pgvector-tutorial
 from dotenv import load_dotenv
 import os
-from langchain_community.document_loaders import TextLoader, UnstructuredPDFLoader, PyPDFLoader
+#from langchain_community.document_loaders import TextLoader, UnstructuredPDFLoader, PyPDFLoader, PDFLoader
 from pathlib import Path
+from langchain_classic.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai.embeddings import OpenAIEmbeddings
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_openai import OpenAI
-from langchain.chains import RetrievalQA
-from langchain_community.llms import HuggingFacePipeline, Ollama
-from transformers import pipeline
+from langchain_classic.chains import RetrievalQA
+#from langchain_community.llms import HuggingFacePipeline, Ollama
+#from transformers import pipeline
 from langchain_community.vectorstores import FAISS
+from langchain_deepseek import ChatDeepSeek
 
 # Load environment variables
 load_dotenv()
-openai_api_key = os.getenv("OPENAI_API_KEY") # Openai token
+deepseek_api_key = os.getenv("DEEPSEEK_API_KEY") # Deepseek token
 hgface_token = os.getenv("HF_TOKEN")
 
 # Initialize the LLM (using TinyLlama/TinyLlama-1.1B-Chat-v1.0)
-llm_model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+#llm_model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 
-pipe = pipeline(
+"""pipe = pipeline(
   "text-generation",
   model = llm_model, #"google/flan-t5-base", # "google/flan-t5-base"
   max_new_tokens=256,
@@ -34,15 +36,20 @@ pipe = pipeline(
   #device=-1
   #token = hgface_token
 )
-llm = HuggingFacePipeline(pipeline=pipe)
+llm = HuggingFacePipeline(pipeline=pipe)"""
+
 
 # Function to set up the RAG system
 def setup_rag_system():
   # Load documents
   documents = []
-  for pdf in Path("data/papers").glob("*.pdf"):
+  for pdf in Path("/Users/kyo/Documents/projects/data_science/rag/data/papers").glob("*.pdf"):
     loader = PyPDFLoader(str(pdf))
-    documents.extend(loader.load())
+    docs = loader.load()
+    print(f"{pdf} -> {len(docs)} pages")
+    documents.extend(docs)
+    
+  print("Nombre total de pages :", len(documents))
     
   #documents = loader.load()
   
@@ -83,6 +90,15 @@ def setup_rag_system():
 
 # Function to get the response from the RAG system
 retriever = setup_rag_system()
+
+llm = ChatDeepSeek(
+  model="deepseek-flash",
+  temperature=0,
+  max_tokens=None,
+  timeout=None,
+  max_retries=2
+)
+
 async def get_rag_response(query : str):
   
   # Retrieve the relevant documents using 'get_relevant_documents' method
@@ -92,12 +108,21 @@ async def get_rag_response(query : str):
   context = "\n".join([doc.page_content for doc in retrieved_docs])
   
   # LLM expects a list of strings (prompts), so we create one by combining the query with retrieved context
-  prompt = [f"Use the following information to answer the question:\n\n{context}\n\nQuestion: {query}"]
+  prompt = f"""
+    Use the following information to answer the question.
 
+    Context:
+    {context}
+
+    Question:
+    {query}
+
+    Answer only using the provided context.
+    """
   # Generate the final response using the language model (LLM)
-  generated_response = llm.generate(prompt)
+  generated_response = llm.invoke(prompt)
   
-  return generated_response
+  return generated_response.content
 
 
 """
